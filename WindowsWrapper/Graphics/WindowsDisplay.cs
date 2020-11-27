@@ -64,6 +64,11 @@ namespace WindowsWrapper.Graphics
             return screenPortionImage;
         }
 
+        /// <summary>
+        /// Captures the total width and height of every monitor side-by-side
+        /// From mittaltarsem <see cref="!:https://www.codeproject.com/Articles/546006/Screen-Capture-on-Multiple-Monitors"/>
+        /// </summary>
+        /// <returns></returns>
         private Rectangle GetAllScreensBounds()
         {
             ICollection<Screen> allScreens = Screen.AllScreens;

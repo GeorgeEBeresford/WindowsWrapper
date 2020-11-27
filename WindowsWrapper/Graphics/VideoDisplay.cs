@@ -9,6 +9,16 @@ namespace WindowsWrapper.Graphics
     /// </summary>
     public abstract class VideoDisplay
     {
+        /// <summary>
+        /// Retrieves a portion of the screen as an image.
+        /// From nobugz at <see cref="!:https://social.msdn.microsoft.com/Forums/en-US/474450b9-e260-4369-9efb-0d57a5b2e06d/copyfromscreen-no-alpha-window-captured"/>
+        /// </summary>
+        /// <param name="displayContext">A handle to the display context which we're retrieving the image from</param>
+        /// <param name="positionX">The X co-ordinate of the top left corner of the portion we're retrieving</param>
+        /// <param name="positionY">The Y co-ordinate of the top left corner of the portion we're retrieving</param>
+        /// <param name="width">The width of the image which will be retrieves</param>
+        /// <param name="height">The height of the image which will be retrieved</param>
+        /// <returns></returns>
         protected Bitmap GetScreenPortionAsImage(IntPtr displayContext, int positionX, int positionY, int width,
             int height)
         {

@@ -4,14 +4,15 @@ using WindowsWrapper.Interop.Structures;
 namespace WindowsWrapper.Interop.Invokers
 {
     /// <summary>
-    /// Contains functions relating to the cursoe that can be P/Invoked
+    /// Contains functions relating to the cursor that can be P/Invoked
     /// </summary>
     internal static class CursorInvoker
     {
         /// <summary>
-        /// Retrie
+        /// Retrieves the position of the mouse cursor, in screen coordinates.
         /// </summary>
-        /// <param name="cursorPosition"></param>
+        /// <param name="cursorPosition">
+        /// A pointer to a POINT structure that receives the screen coordinates of the cursor.</param>
         /// <returns></returns>
         [DllImport("user32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]

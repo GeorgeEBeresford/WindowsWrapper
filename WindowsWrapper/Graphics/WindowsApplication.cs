@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using WindowsWrapper.Interop.Enums;
 using WindowsWrapper.Interop.Invokers;
-using WindowsWrapper.Interop.Structures;
 using Point = System.Drawing.Point;
 using Rectangle = System.Drawing.Rectangle;
 
