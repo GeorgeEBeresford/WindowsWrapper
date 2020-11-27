@@ -7,6 +7,12 @@ namespace WindowsWrapper.FileSystem
 {
     public interface IFile
     {
-        string GetAssociatedFile(string fileExtension);
+        string FindExecutable();
+
+        string GetAssociatedExecutable();
+
+        string GetAssociatedApp();
+
+        bool TryFindExecutable(out string path, out string handleType);
     }
 }

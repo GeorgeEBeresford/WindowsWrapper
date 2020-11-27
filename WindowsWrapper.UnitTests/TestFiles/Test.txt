@@ -1,0 +1,1 @@
+﻿This is a test text file which should allow us to retrieve the correct executable for text files.

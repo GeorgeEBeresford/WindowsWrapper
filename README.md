@@ -16,4 +16,5 @@ Contains a collection of classes which make interacting with the Windows Interop
   
 # Credits  
 *mittaltarsem* for retrieving the bounds of every display side-by-side (https://www.codeproject.com/Articles/546006/Screen-Capture-on-Multiple-Monitors)  
-*nobugz* for retrieving an image from a screen (https://social.msdn.microsoft.com/Forums/en-US/474450b9-e260-4369-9efb-0d57a5b2e06d/copyfromscreen-no-alpha-window-captured)
+*nobugz* for retrieving an image from a screen (https://social.msdn.microsoft.com/Forums/en-US/474450b9-e260-4369-9efb-0d57a5b2e06d/copyfromscreen-no-alpha-window-captured)  
+*Ohad Schneider* for retrieving a file association using a file extension (https://stackoverflow.com/a/17773402)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using WindowsWrapper.Exceptions;
 using WindowsWrapper.Interop.Enums;
 using WindowsWrapper.Interop.Invokers;
 using Point = System.Drawing.Point;
@@ -35,7 +36,7 @@ namespace WindowsWrapper.Graphics
                 out Interop.Structures.Rectangle applicationBounds, Marshal.SizeOf(typeof(Rectangle)));
 
             if (getAttributeResult != 0)
-                throw new Exception($"Could not find application boundaries for handle {Handle}");
+                throw new WindowAttributeNotFoundException($"Could not find application boundaries for handle {Handle}", Handle);
 
             Rectangle bounds = applicationBounds.AsDrawing();
 

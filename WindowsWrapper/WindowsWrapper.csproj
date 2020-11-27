@@ -44,6 +44,8 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exceptions\NoAssociatedFileException.cs" />
+    <Compile Include="Exceptions\WindowAttributeNotFoundException.cs" />
     <Compile Include="FileSystem\IFile.cs" />
     <Compile Include="FileSystem\WindowsFile.cs" />
     <Compile Include="Interop\Enums\AssosF.cs" />

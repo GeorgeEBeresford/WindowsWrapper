@@ -48,5 +48,25 @@ namespace WindowsWrapper.Interop.Invokers
             [Out] StringBuilder pszOut,
             ref uint pcchOut
         );
+
+        /// <summary>
+        /// Retrieves the name of and handle to the executable (.exe) file associated with a specific document file.
+        /// </summary>
+        /// <param name="lpFile">
+        /// The address of a null-terminated string that specifies a file name. This file should be a document.
+        /// </param>
+        /// <param name="lpDirectory">
+        /// The address of a null-terminated string that specifies the default directory. This value can be NULL.
+        /// </param>
+        /// <param name="lpResult">
+        /// The address of a buffer that receives the file name of the associated executable file. This file name is a null-terminated string
+        /// that specifies the executable file started when an "open" by association is run on the file specified in the lpFile parameter. Put
+        /// simply, this is the application that is launched when the document file is directly double-clicked or when Open is chosen from
+        /// the file's shortcut menu. This parameter must contain a valid non-null value and is assumed to be of length MAX_PATH.
+        /// Responsibility for validating the value is left to the programmer.
+        /// </param>
+        /// <returns></returns>
+        [DllImport("shell32.dll")]
+        public static extern int FindExecutable(string lpFile, string lpDirectory, [Out] StringBuilder lpResult);
     }
 }
