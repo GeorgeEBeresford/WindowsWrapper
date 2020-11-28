@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security;
 using System.Text;
 using WindowsWrapper.Exceptions;
+using WindowsWrapper.FileSystem.Processes;
 using WindowsWrapper.Interop.Enums;
 using WindowsWrapper.Interop.Invokers;
 
@@ -90,13 +93,13 @@ namespace WindowsWrapper.FileSystem
             return app;
         }
 
-        public bool TryFindExecutable(out string path, out string handleType)
+        public bool TryFindExecutable(out string path, out HandleType handleType)
         {
             try
             {
                 string associatedExecutable = GetAssociatedExecutable(FileInfo.Extension);
                 path = associatedExecutable;
-                handleType = "Executable";
+                handleType = HandleType.Executable;
                 return true;
             }
             // If we can't find an executable, fair enough. It may be an app.
@@ -108,7 +111,7 @@ namespace WindowsWrapper.FileSystem
             {
                 string associatedApp = GetAssociatedApp(FileInfo.Extension);
                 path = associatedApp;
-                handleType = "App";
+                handleType = HandleType.App;
                 return true;
             }
             // If we can't find an app, we may not have an association
@@ -117,9 +120,64 @@ namespace WindowsWrapper.FileSystem
             }
 
             path = null;
-            handleType = null;
+            handleType = HandleType.NotFound;
 
             return false;
+        }
+
+        public bool TryExecute()
+        {
+            bool isExecutableFound = TryFindExecutable(out string executablePath, out HandleType handleType);
+
+            if (!isExecutableFound)
+            {
+                return false;
+            }
+
+            try
+            {
+                if (handleType == HandleType.Executable)
+                {
+                    StartExecutable(executablePath);
+                }
+                else
+                {
+                    StartApp(executablePath);
+                }
+
+                return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+            catch (ObjectDisposedException)
+            {
+                return false;
+            }
+            catch (FileNotFoundException)
+            {
+                return false;
+            }
+        }
+
+        private void StartExecutable(string executablePath)
+        {
+            string[] executableAndFlags = executablePath.Split(' ');
+
+            // Skip the main executable name and treat anything else as a flag
+            string arguments = string.Join(" ", executableAndFlags.Skip(1));
+            arguments += FileInfo.FullName;
+            arguments = arguments.TrimStart();
+
+            Process startedProcess = Process.Start(executableAndFlags.First(), arguments);
+            ExecutedProcess = new ExecutedProcess(executablePath, FileInfo.FullName, startedProcess);
+        }
+
+        private void StartApp(string appPath)
+        {
+            Process.Start(FileInfo.FullName);
+            ExecutedProcess = new AppProcess(appPath, FileInfo.FullName);
         }
 
         public static string GetAssociatedApp(string fileExtension)
@@ -136,7 +194,7 @@ namespace WindowsWrapper.FileSystem
             // If the command line path only includes arguments then it must be expecting to execute it as-is with command prompt
             if (commandLinePath.StartsWith("%1"))
             {
-                return @"C:\WINDOWS\system32\cmd.exe";
+                return @"C:\WINDOWS\system32\cmd.exe /c";
             }
 
             return commandLinePath;
@@ -185,6 +243,8 @@ namespace WindowsWrapper.FileSystem
 
             return stringBuilder.ToString();
         }
+
+        public IProcess ExecutedProcess { get; private set; }
 
         public new string ToString()
         {

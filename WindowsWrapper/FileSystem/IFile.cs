@@ -13,6 +13,8 @@ namespace WindowsWrapper.FileSystem
 
         string GetAssociatedApp();
 
-        bool TryFindExecutable(out string path, out string handleType);
+        bool TryFindExecutable(out string path, out HandleType handleType);
+
+        bool TryExecute();
     }
 }

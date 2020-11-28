@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WindowsWrapper.FileSystem;
+using WindowsWrapper.FileSystem.Processes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace WindowsWrapper.UnitTests.Filesystem
@@ -17,6 +18,7 @@ namespace WindowsWrapper.UnitTests.Filesystem
         public void BatchFilesOpenedWithCmd()
         {
             AssertFileOpenedWithCorrectExecutable(".bat", ExpectedBatchFileOpener);
+            AssertFileOpenedWithCorrectExecutable(".txt", ExpectedEditor);
         }
 
         [TestMethod]
@@ -38,13 +40,44 @@ namespace WindowsWrapper.UnitTests.Filesystem
             AssertHandleIsRetrievedWithTry(testfile, ExpectedPhotoViewer);
         }
 
+        [TestMethod]
+        public void FileIsExecuted()
+        {
+            WindowsFile testfile = GetTestFile("test.txt");
+            AssertFileIsExecuted(testfile, ExpectedEditor);
+
+            testfile = GetTestFile("test.bat");
+            AssertFileIsExecuted(testfile, ExpectedBatchFileOpener);
+
+            testfile = GetTestFile("test.jpg");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+
+            testfile = GetTestFile("test.bmp");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+
+            testfile = GetTestFile("test.png");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+
+            testfile = GetTestFile("test.gif");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+        }
+
+        private void AssertFileIsExecuted(WindowsFile file, string expectedHandle)
+        {
+            bool isExecuted = file.TryExecute();
+
+            Assert.AreEqual(true, isExecuted, "Process was not executed successfully");
+            Assert.IsNotNull(file.ExecutedProcess, "Process was executed successully but testFile.ExecutedProcess is null");
+            Assert.AreEqual(expectedHandle, file.ExecutedProcess.Name);
+        }
+
         private void AssertHandleIsRetrievedWithTry(WindowsFile windowsFile, string expectedHandle)
         {
-            bool isSuccess = windowsFile.TryFindExecutable(out string path, out string handleType);
+            bool isSuccess = windowsFile.TryFindExecutable(out string path, out HandleType handleType);
 
             Assert.IsTrue(isSuccess, $"Could not find an executable or app for {windowsFile}");
             Assert.AreEqual(expectedHandle, path, $"Path is not {expectedHandle} for file {windowsFile}");
-            Assert.IsNotNull(handleType, $"Handle type is null for {windowsFile}");
+            Assert.AreNotEqual(HandleType.NotFound, handleType, $"Handle type is not found for {windowsFile}");
         }
 
         private void AssertHandleIsRetrieved(WindowsFile windowsFile, string expectedHandle)
@@ -86,8 +119,6 @@ namespace WindowsWrapper.UnitTests.Filesystem
             Assert.IsNotNull(defaultEditor);
             Assert.AreNotEqual("", defaultEditor, $"Blank string returned for the default text editor");
             Assert.AreEqual(ExpectedEditor, defaultEditor, $"Default text editor was not the expected {ExpectedEditor}");
-
-            AssertFileOpenedWithCorrectExecutable(".txt", ExpectedEditor);
         }
 
         private void AssertFileOpenedWithCorrectApp(string fileExtension, string expectedExecutable)
@@ -109,7 +140,7 @@ namespace WindowsWrapper.UnitTests.Filesystem
         }
 
         private const string ExpectedPhotoViewer = @"Microsoft.Windows.Photos_8wekyb3d8bbwe!App";
-        private const string ExpectedBatchFileOpener = @"C:\WINDOWS\system32\cmd.exe";
-        private const string ExpectedEditor = @"D:\Program Files (x86)\Notepad++\notepad++.exe";
+        private const string ExpectedBatchFileOpener = @"C:\WINDOWS\system32\cmd.exe /c";
+        private const string ExpectedEditor = @"C:\WINDOWS\system32\NOTEPAD.EXE";
     }
 }

@@ -46,7 +46,11 @@
   <ItemGroup>
     <Compile Include="Exceptions\NoAssociatedFileException.cs" />
     <Compile Include="Exceptions\WindowAttributeNotFoundException.cs" />
+    <Compile Include="FileSystem\HandleType.cs" />
     <Compile Include="FileSystem\IFile.cs" />
+    <Compile Include="FileSystem\Processes\AppProcess.cs" />
+    <Compile Include="FileSystem\Processes\ExecutableProcess.cs" />
+    <Compile Include="FileSystem\Processes\IProcess.cs" />
     <Compile Include="FileSystem\WindowsFile.cs" />
     <Compile Include="Interop\Enums\AssosF.cs" />
     <Compile Include="Interop\Enums\AssosStr.cs" />
