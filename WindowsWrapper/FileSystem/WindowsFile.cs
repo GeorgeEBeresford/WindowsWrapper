@@ -43,6 +43,13 @@ namespace WindowsWrapper.FileSystem
                     "Cannot open a file which does not exist. Please use the static methods GetAssociatedExecutable or GetAssociatedApp instead.");
             }
 
+
+            // If we are finding the executable for an executable, return the current file
+            if (FileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase))
+            {
+                return FileInfo.FullName;
+            }
+
             // https://social.msdn.microsoft.com/Forums/vstudio/en-US/af164414-592a-42bb-bb24-47c4fe580123/how-do-i-get-the-value-of-maxpath-under-c
             const int maxPath = 260;
             StringBuilder pathBuilder = new StringBuilder(maxPath);
@@ -95,6 +102,14 @@ namespace WindowsWrapper.FileSystem
 
         public bool TryFindExecutable(out string path, out HandleType handleType)
         {
+            // If we are finding the executable for an executable, return the current file
+            if (FileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase))
+            {
+                path = FileInfo.FullName;
+                handleType = HandleType.Executable;
+                return true;
+            }
+
             try
             {
                 string associatedExecutable = GetAssociatedExecutable(FileInfo.Extension);
@@ -170,7 +185,18 @@ namespace WindowsWrapper.FileSystem
             arguments += FileInfo.FullName;
             arguments = arguments.TrimStart();
 
-            Process startedProcess = Process.Start(executableAndFlags.First(), arguments);
+            Process startedProcess;
+
+            // The majority of files in a windows heirarchy are probably not executables (e.g. dlls, txt files, images, etc). Default to the majority case
+            if (!executableAndFlags.First().Equals(FileInfo.FullName))
+            {
+                startedProcess = Process.Start(executableAndFlags.First(), arguments);
+            }
+            else
+            {
+                startedProcess = Process.Start(FileInfo.FullName);
+            }
+
             ExecutedProcess = new ExecutedProcess(executablePath, FileInfo.FullName, startedProcess);
         }
 
@@ -195,6 +221,12 @@ namespace WindowsWrapper.FileSystem
             if (commandLinePath.StartsWith("%1"))
             {
                 return @"C:\WINDOWS\system32\cmd.exe /c";
+            }
+
+            if (commandLinePath.Equals(@"C:\WINDOWS\System32\msiexec.exe", StringComparison.OrdinalIgnoreCase))
+            {
+                // If we are clicking on an MSI executable, default to installing it
+                return @"C:\WINDOWS\System32\msiexec.exe /i";
             }
 
             return commandLinePath;

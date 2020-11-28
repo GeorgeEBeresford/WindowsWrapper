@@ -69,6 +69,7 @@
     <None Include="TestFiles\Test.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="TestFiles\Test.setup.msi" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\WindowsWrapper\WindowsWrapper.csproj">

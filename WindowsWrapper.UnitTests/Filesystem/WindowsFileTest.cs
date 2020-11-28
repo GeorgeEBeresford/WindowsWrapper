@@ -15,10 +15,47 @@ namespace WindowsWrapper.UnitTests.Filesystem
     public class WindowsFileTest
     {
         [TestMethod]
-        public void BatchFilesOpenedWithCmd()
+        public void CorrectAppOpenedFile()
+        {
+            AssertFileOpenedWithCorrectApp(".png", ExpectedPhotoViewer);
+            AssertFileOpenedWithCorrectApp(".bmp", ExpectedPhotoViewer);
+            AssertFileOpenedWithCorrectApp(".jpg", ExpectedPhotoViewer);
+            AssertFileOpenedWithCorrectApp(".gif", ExpectedPhotoViewer);
+        }
+
+        [TestMethod]
+        public void CorrectExecutableOpenedFile()
         {
             AssertFileOpenedWithCorrectExecutable(".bat", ExpectedBatchFileOpener);
             AssertFileOpenedWithCorrectExecutable(".txt", ExpectedEditor);
+        }
+
+        [TestMethod]
+        public void FileIsExecuted()
+        {
+            WindowsFile testfile = GetTestFile("test.txt");
+            AssertFileIsExecuted(testfile, ExpectedEditor);
+
+            testfile = new WindowsFile(@"C:\WINDOWS\system32\NOTEPAD.EXE");
+            AssertFileIsExecuted(testfile, testfile.ToString());
+
+            testfile = new WindowsFile("setup.msi");
+            AssertFileIsExecuted(testfile, ExpectedMsiExecutableOpener);
+
+            testfile = GetTestFile("test.bat");
+            AssertFileIsExecuted(testfile, ExpectedBatchFileOpener);
+
+            testfile = GetTestFile("test.jpg");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+
+            testfile = GetTestFile("test.bmp");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+
+            testfile = GetTestFile("test.png");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+
+            testfile = GetTestFile("test.gif");
+            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
         }
 
         [TestMethod]
@@ -41,25 +78,12 @@ namespace WindowsWrapper.UnitTests.Filesystem
         }
 
         [TestMethod]
-        public void FileIsExecuted()
+        public void TextFilesOpenedWithEditor()
         {
-            WindowsFile testfile = GetTestFile("test.txt");
-            AssertFileIsExecuted(testfile, ExpectedEditor);
-
-            testfile = GetTestFile("test.bat");
-            AssertFileIsExecuted(testfile, ExpectedBatchFileOpener);
-
-            testfile = GetTestFile("test.jpg");
-            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
-
-            testfile = GetTestFile("test.bmp");
-            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
-
-            testfile = GetTestFile("test.png");
-            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
-
-            testfile = GetTestFile("test.gif");
-            AssertFileIsExecuted(testfile, ExpectedPhotoViewer);
+            string defaultEditor = WindowsFile.GetDefaultTextEditor();
+            Assert.IsNotNull(defaultEditor);
+            Assert.AreNotEqual("", defaultEditor, $"Blank string returned for the default text editor");
+            Assert.AreEqual(ExpectedEditor, defaultEditor, $"Default text editor was not the expected {ExpectedEditor}");
         }
 
         private void AssertFileIsExecuted(WindowsFile file, string expectedHandle)
@@ -103,24 +127,6 @@ namespace WindowsWrapper.UnitTests.Filesystem
             return windowsFile;
         }
 
-        [TestMethod]
-        public void PhotosOpenedWithViewer()
-        {
-            AssertFileOpenedWithCorrectApp(".png", ExpectedPhotoViewer);
-            AssertFileOpenedWithCorrectApp(".bmp", ExpectedPhotoViewer);
-            AssertFileOpenedWithCorrectApp(".jpg", ExpectedPhotoViewer);
-            AssertFileOpenedWithCorrectApp(".gif", ExpectedPhotoViewer);
-        }
-
-        [TestMethod]
-        public void TextFilesOpenedWithEditor()
-        {
-            string defaultEditor = WindowsFile.GetDefaultTextEditor();
-            Assert.IsNotNull(defaultEditor);
-            Assert.AreNotEqual("", defaultEditor, $"Blank string returned for the default text editor");
-            Assert.AreEqual(ExpectedEditor, defaultEditor, $"Default text editor was not the expected {ExpectedEditor}");
-        }
-
         private void AssertFileOpenedWithCorrectApp(string fileExtension, string expectedExecutable)
         {
             string associatedExecutable = WindowsFile.GetAssociatedApp(fileExtension);
@@ -141,6 +147,7 @@ namespace WindowsWrapper.UnitTests.Filesystem
 
         private const string ExpectedPhotoViewer = @"Microsoft.Windows.Photos_8wekyb3d8bbwe!App";
         private const string ExpectedBatchFileOpener = @"C:\WINDOWS\system32\cmd.exe /c";
+        private const string ExpectedMsiExecutableOpener = @"C:\WINDOWS\System32\msiexec.exe /i";
         private const string ExpectedEditor = @"C:\WINDOWS\system32\NOTEPAD.EXE";
     }
 }
